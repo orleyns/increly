@@ -1,14 +1,16 @@
 import SwiftUI
 
 struct CounterCardView: View {
-    @Environment(\\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var modelContext
     let counter: Counter
 
+    @State private var showingManualAdd = false
+
     var body: some View {
-        NavigationLink {
-            CounterDetailView(counter: counter)
-        } label: {
-            HStack(spacing: 14) {
+        HStack(spacing: 14) {
+            NavigationLink {
+                CounterDetailView(counter: counter)
+            } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(counter.name)
                         .font(.headline)
@@ -18,33 +20,43 @@ struct CounterCardView: View {
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
-
-                Spacer(minLength: 8)
-
-                Text("\\(counter.total)")
-                    .font(.title2.weight(.bold))
-                    .monospacedDigit()
-                    .foregroundStyle(.primary)
-
-                Button {
-                    counter.increment()
-                    try? modelContext.save()
-                } label: {
-                    Text(counter.emoji)
-                        .font(.title2)
-                        .frame(width: 48, height: 48)
-                        .background(.thinMaterial, in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Increment \\(counter.name)")
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(14)
-            .background(
-                Color(hex: counter.colorHex).opacity(0.72),
-                in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-            )
+            .buttonStyle(.plain)
+
+            Text("\(counter.total)")
+                .font(.title2.weight(.bold))
+                .monospacedDigit()
+                .foregroundStyle(.primary)
+
+            Button {
+                counter.increment()
+                try? modelContext.save()
+            } label: {
+                Text(counter.emoji)
+                    .font(.title2)
+                    .frame(width: 48, height: 48)
+                    .background(.thinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Increment \(counter.name)")
+
+            Button {
+                showingManualAdd = true
+            } label: {
+                Image(systemName: "plus")
+                    .font(.caption.weight(.bold))
+                    .frame(width: 26, height: 26)
+                    .background(.thinMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Add past clicks to \(counter.name)")
         }
-        .buttonStyle(.plain)
+        .padding(14)
+        .background(
+            Color(hex: counter.colorHex).opacity(0.72),
+            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+        )
         .contextMenu {
             Button {
                 counter.isArchived = true
@@ -52,6 +64,9 @@ struct CounterCardView: View {
             } label: {
                 Label("Archive", systemImage: "archivebox")
             }
+        }
+        .sheet(isPresented: $showingManualAdd) {
+            AddManualIncrementsView(counter: counter)
         }
     }
 }
