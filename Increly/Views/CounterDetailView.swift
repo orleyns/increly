@@ -2,9 +2,13 @@ import SwiftUI
 
 struct CounterDetailView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+
     let counter: Counter
 
-    @State private var showingManualAdd = false\n    @State private var showingEdit = false
+    @State private var showingManualAdd = false
+    @State private var showingEdit = false
+    @State private var showingDeleteConfirmation = false
 
     private var events: [CounterEvent] {
         counter.events.sorted { $0.timestamp > $1.timestamp }
@@ -142,15 +146,44 @@ struct CounterDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
+                    showingEdit = true
+                } label: {
+                    Image(systemName: "pencil")
+                }
+                .accessibilityLabel("Edit counter")
+
+                Button {
                     showingManualAdd = true
                 } label: {
                     Image(systemName: "plus")
                 }
                 .accessibilityLabel("Add past clicks")
+
+                Button(role: .destructive) {
+                    showingDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .accessibilityLabel("Delete counter")
             }
         }
-        .sheet(isPresented: $showingEdit) {\n            EditCounterView(counter: counter)\n        }\n        .sheet(isPresented: $showingManualAdd) {
+        .sheet(isPresented: $showingEdit) {
+            EditCounterView(counter: counter)
+        }
+        .sheet(isPresented: $showingManualAdd) {
             AddManualIncrementsView(counter: counter)
+        }
+        .confirmationDialog(
+            "Delete \(counter.name)?",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Counter", role: .destructive) {
+                deleteCounter()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This will permanently delete the counter and its event history.")
         }
     }
 
@@ -159,6 +192,12 @@ struct CounterDetailView: View {
             modelContext.delete(events[index])
         }
         try? modelContext.save()
+    }
+
+    private func deleteCounter() {
+        modelContext.delete(counter)
+        try? modelContext.save()
+        dismiss()
     }
 
     private func formatInterval(_ interval: TimeInterval) -> String {
