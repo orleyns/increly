@@ -4,7 +4,7 @@ struct CounterDetailView: View {
     @Environment(\.modelContext) private var modelContext
     let counter: Counter
 
-    @State private var showingManualAdd = false
+    @State private var showingManualAdd = false\n    @State private var showingEdit = false
 
     private var events: [CounterEvent] {
         counter.events.sorted { $0.timestamp > $1.timestamp }
@@ -140,7 +140,7 @@ struct CounterDetailView: View {
         .navigationTitle(counter.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     showingManualAdd = true
                 } label: {
@@ -149,7 +149,7 @@ struct CounterDetailView: View {
                 .accessibilityLabel("Add past clicks")
             }
         }
-        .sheet(isPresented: $showingManualAdd) {
+        .sheet(isPresented: $showingEdit) {\n            EditCounterView(counter: counter)\n        }\n        .sheet(isPresented: $showingManualAdd) {
             AddManualIncrementsView(counter: counter)
         }
     }
