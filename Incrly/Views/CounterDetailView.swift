@@ -69,7 +69,7 @@ struct CounterDetailView: View {
         )
     }
 
-    var body: some View {
+    private var calendarView: some View {\n        CounterCalendarView(events: events)\n            .padding(.vertical, 4)\n    }\n\n    var body: some View {
         List {
             Section {
                 VStack(spacing: 10) {
@@ -90,7 +90,7 @@ struct CounterDetailView: View {
                         Label("Increment", systemImage: "plus")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.borderedProminent)\n                    .controlSize(.large)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
