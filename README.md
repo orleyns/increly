@@ -1,4 +1,4 @@
-# Incr&ly
+# incr&ly
 
 A simple and open-source event counter for iOS.
 
