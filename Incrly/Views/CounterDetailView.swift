@@ -117,6 +117,11 @@ struct CounterDetailView: View {
                 }
             }
 
+            Section("Calendar") {
+                CounterCalendarView(events: events)
+                    .padding(.vertical, 4)
+            }
+
             Section("History") {
                 if events.isEmpty {
                     Text("No events recorded yet")
