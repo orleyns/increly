@@ -4,7 +4,7 @@ A simple and open-source event counter for iOS.
 
 ## Concept
 
-Incr&ly lets you create as many customizable counters as you want. Every tap records a timestamped event, making it possible to track both a total and the time elapsed since the latest occurrence.
+incr&ly lets you create as many customizable counters as you want. Every tap records a timestamped event, making it possible to track both a total and the time elapsed since the latest occurrence.
 
 Examples: ☕ Coffee, 🍬 Candies, 🎸 Training, 💡 Habits.
 
