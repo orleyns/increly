@@ -14,9 +14,7 @@ struct CounterDetailView: View {
         counter.events.sorted { $0.timestamp < $1.timestamp }
     }
 
-    private var calendar: Calendar {
-        .current
-    }
+    private var calendar: Calendar { .current }
 
     private var todayCount: Int {
         events.filter { calendar.isDateInToday($0.timestamp) }.count
@@ -37,27 +35,15 @@ struct CounterDetailView: View {
     }
 
     private var averagePerDay: Double? {
-        guard !events.isEmpty else { return nil }
-
-        let firstDay = calendar.startOfDay(for: chronologicalEvents.first!.timestamp)
+        guard let firstEvent = chronologicalEvents.first else { return nil }
+        let firstDay = calendar.startOfDay(for: firstEvent.timestamp)
         let today = calendar.startOfDay(for: .now)
         let dayCount = max(calendar.dateComponents([.day], from: firstDay, to: today).day ?? 0, 0) + 1
-
         return Double(events.count) / Double(dayCount)
     }
 
-    private var averageInterval: TimeInterval? {
-        intervalStatistics.average
-    }
-
-    private var longestInterval: TimeInterval? {
-        intervalStatistics.longest
-    }
-
     private var intervalStatistics: (average: TimeInterval?, longest: TimeInterval?) {
-        guard chronologicalEvents.count >= 2 else {
-            return (nil, nil)
-        }
+        guard chronologicalEvents.count >= 2 else { return (nil, nil) }
 
         let intervals = zip(chronologicalEvents, chronologicalEvents.dropFirst()).map {
             $1.timestamp.timeIntervalSince($0.timestamp)
@@ -69,12 +55,10 @@ struct CounterDetailView: View {
         )
     }
 
-    private var calendarView: some View {
-        CounterCalendarView(events: events)
-            .padding(.vertical, 4)\n    }\n\n    var body: some View {
+    var body: some View {
         List {
             Section {
-                VStack(spacing: 10) {
+                VStack(spacing: 14) {
                     Text(counter.emoji)
                         .font(.system(size: 56))
                         .frame(width: 92, height: 92)
@@ -96,7 +80,6 @@ struct CounterDetailView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.large)
-                    .controlSize(.large)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -114,12 +97,12 @@ struct CounterDetailView: View {
                     )
                 }
 
-                if let averageInterval {
-                    StatisticRow(title: "Average interval", value: formatInterval(averageInterval))
+                if let average = intervalStatistics.average {
+                    StatisticRow(title: "Average interval", value: formatInterval(average))
                 }
 
-                if let longestInterval {
-                    StatisticRow(title: "Longest interval", value: formatInterval(longestInterval))
+                if let longest = intervalStatistics.longest {
+                    StatisticRow(title: "Longest interval", value: formatInterval(longest))
                 }
             }
 
@@ -153,9 +136,9 @@ struct CounterDetailView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle(counter.name)
         .navigationBarTitleDisplayMode(.inline)
-        .listStyle(.insetGrouped)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -172,12 +155,9 @@ struct CounterDetailView: View {
     }
 
     private func deleteEvents(at offsets: IndexSet) {
-        let selectedEvents = offsets.map { events[$0] }
-
-        for event in selectedEvents {
-            modelContext.delete(event)
+        for index in offsets {
+            modelContext.delete(events[index])
         }
-
         try? modelContext.save()
     }
 
@@ -187,14 +167,8 @@ struct CounterDetailView: View {
         let hours = (totalMinutes % (24 * 60)) / 60
         let minutes = totalMinutes % 60
 
-        if days > 0 {
-            return hours > 0 ? "\(days)d \(hours)h" : "\(days)d"
-        }
-
-        if hours > 0 {
-            return minutes > 0 ? "\(hours)h \(minutes)min" : "\(hours)h"
-        }
-
+        if days > 0 { return hours > 0 ? "\(days)d \(hours)h" : "\(days)d" }
+        if hours > 0 { return minutes > 0 ? "\(hours)h \(minutes)min" : "\(hours)h" }
         return "\(minutes)min"
     }
 }
