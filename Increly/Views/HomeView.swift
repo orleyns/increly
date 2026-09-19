@@ -2,8 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct HomeView: View {
-    @Environment(\\.modelContext) private var modelContext
-    @Query(filter: #Predicate<Counter> { !$0.isArchived }, sort: \\.createdAt)
+    @Environment(\.modelContext) private var modelContext
+    @Query(filter: #Predicate<Counter> { !$0.isArchived }, sort: \.createdAt)
     private var counters: [Counter]
 
     @State private var showingAddCounter = false
@@ -23,7 +23,7 @@ struct HomeView: View {
                 .padding(.horizontal)
                 .padding(.bottom, 96)
             }
-            .navigationTitle("Incr&ly")
+            .navigationTitle("incr&ly")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -56,7 +56,7 @@ struct HomeView: View {
         ContentUnavailableView {
             Label("No counters yet", systemImage: "plus.circle")
         } description: {
-            Text("Create your first Incr&ly counter to start recording events.")
+            Text("Create your first incr&ly counter to start recording events.")
         } actions: {
             Button("Create a counter") {
                 showingAddCounter = true
