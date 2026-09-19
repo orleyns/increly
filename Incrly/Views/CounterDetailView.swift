@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct CounterDetailView: View {
-    @Environment(\\.modelContext) private var modelContext
+    @Environment(\.modelContext) private var modelContext
     let counter: Counter
+
+    @State private var showingManualAdd = false
 
     private var events: [CounterEvent] {
         counter.events.sorted { $0.timestamp > $1.timestamp }
@@ -14,7 +16,7 @@ struct CounterDetailView: View {
                 VStack(spacing: 10) {
                     Text(counter.emoji)
                         .font(.system(size: 52))
-                    Text("\\(counter.total)")
+                    Text("\(counter.total)")
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .monospacedDigit()
                     Text(ElapsedTimeFormatter.string(since: counter.lastOccurrence))
@@ -28,6 +30,14 @@ struct CounterDetailView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
+
+                    Button {
+                        showingManualAdd = true
+                    } label: {
+                        Label("Add past clicks", systemImage: "clock.arrow.circlepath")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
@@ -51,5 +61,18 @@ struct CounterDetailView: View {
         }
         .navigationTitle(counter.name)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingManualAdd = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .accessibilityLabel("Add past clicks")
+            }
+        }
+        .sheet(isPresented: $showingManualAdd) {
+            AddManualIncrementsView(counter: counter)
+        }
     }
 }
