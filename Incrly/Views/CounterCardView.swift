@@ -4,8 +4,6 @@ struct CounterCardView: View {
     @Environment(\.modelContext) private var modelContext
     let counter: Counter
 
-    @State private var showingManualAdd = false
-
     var body: some View {
         HStack(spacing: 14) {
             NavigationLink {
@@ -40,17 +38,6 @@ struct CounterCardView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Increment \(counter.name)")
-
-            Button {
-                showingManualAdd = true
-            } label: {
-                Image(systemName: "plus")
-                    .font(.caption.weight(.bold))
-                    .frame(width: 26, height: 26)
-                    .background(.thinMaterial, in: Circle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Add past clicks to \(counter.name)")
         }
         .padding(14)
         .background(
@@ -64,9 +51,6 @@ struct CounterCardView: View {
             } label: {
                 Label("Archive", systemImage: "archivebox")
             }
-        }
-        .sheet(isPresented: $showingManualAdd) {
-            AddManualIncrementsView(counter: counter)
         }
     }
 }
