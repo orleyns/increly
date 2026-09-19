@@ -11,7 +11,7 @@ final class Counter {
     var initialValue: Int
     var isArchived: Bool
 
-    @Relationship(deleteRule: .cascade, inverse: \\CounterEvent.counter)
+    @Relationship(deleteRule: .cascade, inverse: \CounterEvent.counter)
     var events: [CounterEvent]
 
     init(
@@ -39,7 +39,24 @@ final class Counter {
         events.max(by: { $0.timestamp < $1.timestamp })?.timestamp
     }
 
+    /// Records a real event at a specific point in time.
     func increment(at date: Date = .now) {
         events.append(CounterEvent(timestamp: date, counter: self))
+    }
+
+    /// Adds to the total without creating a historical event.
+    /// This is useful when importing a previous total without knowing when
+    /// the corresponding increments happened.
+    func addUndatedIncrements(_ count: Int) {
+        guard count > 0 else { return }
+        initialValue += count
+    }
+
+    /// Adds multiple historical events on the same date.
+    func addHistoricalIncrements(_ count: Int, on date: Date) {
+        guard count > 0 else { return }
+        for _ in 0..<count {
+            increment(at: date)
+        }
     }
 }
